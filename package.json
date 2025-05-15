@@ -1,0 +1,28 @@
+{
+  "name": "phaser-game",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Ein einfaches Phaser-Spiel mit automatisierten Tests und GitHub Pages Deployment",
+  "main": "index.html",
+  "scripts": {
+    "test": "npx jest"
+  },
+  "keywords": [
+    "phaser",
+    "game",
+    "javascript"
+  ],
+  "author": "Hinrich-Wilken Rose",
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "phaser3spectorjs": "^0.0.8"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "phaser": "^3.88.2"
+  }
+}
