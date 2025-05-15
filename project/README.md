@@ -1,7 +1,5 @@
-# 🎮 Phaser Game – Minimalprojekt
-
-Ein einfaches Phaser-Spiel, bei dem ein roter Kreis in der Mitte des Bildschirms erscheint und sich mit den Pfeiltasten nach **links** und **rechts** bewegen lässt.  
-Automatisierte Tests mit **Jest** und **Deployment über GitHub Pages** sind integriert.
+# Dino-Jump
+Dino Jump ist ein Einzelspieler-Jump-and-Run-Spiel für den Desktop, das auf dem bekannten Chrome-Dino-Spiel basiert. Der Spieler übernimmt die Steuerung eines laufenden Dinosauriers, der in einer endlosen 2D-Wüstenlandschaft Hindernissen wie Kakteen und Pterodaktylen ausweichen muss.
 
 ---
 
