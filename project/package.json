@@ -1,0 +1,27 @@
+{
+  "name": "phaser-game",
+  "version": "1.0.0",
+  "description": "Ein einfaches Phaser-Spiel mit automatisierten Tests und GitHub Pages Deployment",
+  "main": "index.html",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "phaser",
+    "game",
+    "javascript"
+  ],
+  "author": "Hinrich-Wilken Rose",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "moduleFileExtensions": [
+      "js"
+    ]
+  }
+}
