@@ -16,7 +16,7 @@
     "jest": "^29.7.0"
   },
   "jest": {
-    "testEnvironment": "jsdom",
+    "testEnvironment": "jest-environment-jsdom",
     "roots": [
       "<rootDir>/tests"
     ],
