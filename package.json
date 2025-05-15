@@ -1,6 +1,7 @@
 {
   "name": "phaser-game",
   "version": "1.0.0",
+  "type": "module",
   "description": "Ein einfaches Phaser-Spiel mit automatisierten Tests und GitHub Pages Deployment",
   "main": "index.html",
   "scripts": {
