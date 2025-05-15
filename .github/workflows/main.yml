@@ -49,5 +49,11 @@ jobs:
         with:
           path: dist
 
+      - name: Upload build logs or artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs
+          path: path/to/logs
+
       - name: 🚀 Deploy to GitHub Pages
         uses: actions/deploy-pages@v3
