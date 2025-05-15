@@ -44,16 +44,16 @@ jobs:
       - name: ⚙️ Setup GitHub Pages
         uses: actions/configure-pages@v4
 
-      - name: 📤 Upload GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: dist
-
       - name: Upload build logs or artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-logs
           path: path/to/logs
+
+      - name: 📤 Upload GitHub Pages Artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: dist
 
       - name: 🚀 Deploy to GitHub Pages
         uses: actions/deploy-pages@v3
