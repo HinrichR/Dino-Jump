@@ -28,5 +28,8 @@
     "moduleFileExtensions": [
       "js"
     ]
+  },
+  "dependencies": {
+    "phaser": "^3.88.2"
   }
 }
