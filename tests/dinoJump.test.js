@@ -1,6 +1,5 @@
 const Phaser = require('phaser');
 const { MainScene, createGame } = require('../js/dinoJump.js');
-const { jest } = require('@jest/globals');
 
 describe('MainScene', () => {
   let scene;
