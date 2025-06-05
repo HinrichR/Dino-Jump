@@ -8,15 +8,12 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
-    // Mittelpunkt berechnen
     const centerX = this.cameras.main.width / 2;
     const centerY = this.cameras.main.height / 2;
 
-    // Kreis als Grafik erzeugen
     this.circle = this.add.circle(centerX, centerY, 30, 0xff0000);
-    this.speed = 200; // Pixel pro Sekunde
+    this.speed = 200;
 
-    // Tasteneingaben registrieren
     this.cursors = this.input.keyboard.createCursorKeys();
   }
 
@@ -31,20 +28,26 @@ class MainScene extends Phaser.Scene {
   }
 }
 
-// Nur exportieren, wenn in Node (z. B. Jest-Test)
-if (typeof module !== 'undefined') {
-  module.exports = { MainScene };
+// Konfiguration auslagern
+const config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  backgroundColor: '#222',
+  scene: MainScene
+};
+
+// Funktion für Tests und Programmstart
+function createGame() {
+  return new Phaser.Game(config);
 }
 
-// Nur starten, wenn im Browser
-if (typeof window !== 'undefined') {
-  const config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    backgroundColor: '#222',
-    scene: MainScene
-  };
+// Nur im Node-Umfeld exportieren (z.B. für Jest)
+if (typeof module !== 'undefined') {
+  module.exports = { MainScene, createGame };
+}
 
-  const game = new Phaser.Game(config);
+// Nur im Browser starten
+if (typeof window !== 'undefined') {
+  createGame();
 }

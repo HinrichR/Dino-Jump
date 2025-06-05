@@ -1,34 +1,43 @@
 import Phaser from 'phaser';
-import { jest } from '@jest/globals';
-import { MainScene } from '../js/dinoJump.js';
+import { MainScene, createGame } from '../js/dinoJump';
 
 describe('MainScene', () => {
   let scene;
 
   beforeEach(() => {
-    // Scene vorbereiten
+    // Neue Scene erzeugen
     scene = new MainScene();
 
-    // Dummy Methoden bereitstellen
+    // Simuliere Tastatur-Input vorher, da create() darauf zugreift
+    const fakeCursors = {
+      left: { isDown: false },
+      right: { isDown: false }
+    };
+
+    scene.input = {
+      keyboard: {
+        createCursorKeys: () => fakeCursors
+      }
+    };
+
     scene.add = {
-      circle: jest.fn().mockImplementation((x, y, r, color) => ({ x, y, r, color })),
+      circle: jest.fn().mockImplementation((x, y, r, color) => ({ x, y, r, color }))
     };
 
     scene.cameras = {
       main: { width: 800, height: 600 }
     };
 
-    // Eingabeobjekte simulieren
-    scene.input = {
-      keyboard: {
-        createCursorKeys: () => ({
-          left: { isDown: false },
-          right: { isDown: false }
-        })
-      }
-    };
-
+    // Jetzt create() aufrufen – input ist vorbereitet
     scene.create();
+
+    // Referenz für später
+    scene.cursors = fakeCursors;
+  });
+
+  test('Phaser game should initialize', () => {
+    const game = createGame();
+    expect(game).toBeDefined();
   });
 
   test('erstellt einen Kreis in der Mitte', () => {
@@ -40,14 +49,8 @@ describe('MainScene', () => {
 
   test('bewegt sich nach rechts bei Tasteneingabe', () => {
     const initialX = scene.circle.x;
-
-    // Rechte Taste simulieren
     scene.cursors.right.isDown = true;
-
-    // update aufrufen mit 100ms delta
-    scene.update(0, 100);
-
-    // Kreis sollte sich nach rechts bewegt haben
+    scene.update(0, 100); // 100ms delta
     expect(scene.circle.x).toBeGreaterThan(initialX);
   });
 });
