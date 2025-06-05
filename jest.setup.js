@@ -1,8 +1,11 @@
-// jest.setup.js
 const { createCanvas } = require('canvas');
 
-Object.defineProperty(global.HTMLCanvasElement.prototype, 'getContext', {
-  value: function (type) {
-    return createCanvas(800, 600).getContext(type);
-  },
+// global.HTMLCanvasElement mocken
+Object.defineProperty(global, 'HTMLCanvasElement', {
+  value: class HTMLCanvasElement {},
+  writable: true,
 });
+
+global.HTMLCanvasElement.prototype.getContext = function(type) {
+  return createCanvas(800, 600).getContext(type);
+};
