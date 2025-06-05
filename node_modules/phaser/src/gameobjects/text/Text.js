@@ -322,6 +322,8 @@ var Text = new Class({
     {
         if (!this.style.rtl)
         {
+            this.canvas.dir = 'ltr';
+            this.context.direction = 'ltr';
             return;
         }
 
@@ -443,7 +445,7 @@ var Text = new Class({
                 var wordWithSpace = word + ' ';
                 var letterSpacingWidth = wordWithSpace.length * this.letterSpacing;
                 var wordWidth = context.measureText(wordWithSpace).width + letterSpacingWidth;
-                console.log(words.length, word);
+
                 if (wordWidth > currentLineWidth)
                 {
                     // Break word

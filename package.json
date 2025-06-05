@@ -30,6 +30,7 @@
     ]
   },
   "dependencies": {
+    "canvas": "^2.11.2",
     "phaser": "^3.88.2"
   }
 }
