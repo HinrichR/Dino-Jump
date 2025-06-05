@@ -21,15 +21,6 @@
     "jest-environment-jsdom": "^29.7.0",
     "phaser3spectorjs": "^0.0.8"
   },
-  "jest": {
-    "testEnvironment": "jest-environment-jsdom",
-    "roots": [
-      "<rootDir>/tests"
-    ],
-    "moduleFileExtensions": [
-      "js"
-    ]
-  },
   "dependencies": {
     "canvas": "^2.11.2",
     "phaser": "^3.88.2"
