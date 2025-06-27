@@ -1,3 +1,5 @@
+// import { spawnObject } from './objects.js';
+
 class MainScene extends Phaser.Scene {
 	constructor() {
 		super({ key: 'MainScene' });
@@ -20,6 +22,8 @@ class MainScene extends Phaser.Scene {
 	create() {
 		this.gameIsOver = false;
 		this.scrollSpeed = 8;
+		this.isDucking = false;
+		this.startScroll = false;
 		const centerX = this.cameras.main.width / 2;
 		const centerY = this.cameras.main.height / 2;
 
@@ -56,10 +60,9 @@ class MainScene extends Phaser.Scene {
 			repeat: 0,
 		});
 
-		this.player = this.physics.add.sprite(centerX, centerY, 'idle1');
+		this.player = this.physics.add.sprite(350, 770, 'idle1');
 		this.player.setScale(0.35);
-		// this.player.body.setSize(150, 375);
-		this.player.body.setSize(0, 0);
+		this.player.body.setSize(180, 375);
 		this.player.body.setOffset(130, 50);
 		this.player.play('idle');
 
@@ -92,15 +95,23 @@ class MainScene extends Phaser.Scene {
 		this.spawnObstacle = () => {
 			if (this.gameIsOver) return;
 
-			const obstacle = this.physics.add.sprite(2200, 730, 'obstacle');
-			obstacle.body.allowGravity = false;
-			obstacle.setImmovable(true);
-			obstacle.setSize(85, 170, true);
-			obstacle.setOffset(30, 0);
+			const groupSize = Phaser.Math.Between(1, 3);
+			const baseX = 2200;
 
-			this.obstacles.add(obstacle);
+			for (let i = 0; i < groupSize; i++) {
+				const spacing = 100;
+				const x = baseX + i * spacing;
 
-			const nextDelay = Phaser.Math.Between(4000, 7500);
+				const obstacle = this.physics.add.sprite(x, 730, 'obstacle');
+				obstacle.body.allowGravity = false;
+				obstacle.setImmovable(true);
+				obstacle.setSize(85, 160, true);
+				obstacle.setOffset(55, 25);
+
+				this.obstacles.add(obstacle);
+			}
+
+			const nextDelay = Phaser.Math.Between(3000, 6000);
 			this.time.delayedCall(nextDelay, this.spawnObstacle, [], this);
 		};
 
@@ -120,16 +131,6 @@ class MainScene extends Phaser.Scene {
 		});
 		this.scoreText.setScrollFactor(0);
 
-		this.time.addEvent({
-			delay: 1000,
-			callback: () => {
-				this.score++;
-				this.scoreText.setText('Score: ' + this.score);
-			},
-			callbackScope: this,
-			loop: true,
-		});
-
 		this.keysPressedText = this.add.text(20, 60, 'Keys: ', {
 			fontSize: '24px',
 			fill: '#fff',
@@ -140,41 +141,71 @@ class MainScene extends Phaser.Scene {
 	update(time, delta) {
 		const dt = delta / 1000;
 		let isMoving = false;
-		let isDucking = false;
+
+		if (
+			!this.startScroll &&
+			(this.cursors.left.isDown ||
+				this.cursors.right.isDown ||
+				this.jumpKey.isDown ||
+				this.cursors.up.isDown)
+		) {
+			this.startScroll = true;
+
+			// Start the score timer now that scrolling begins
+			this.time.addEvent({
+				delay: 1000,
+				callback: () => {
+					this.score++;
+					this.scoreText.setText('Score: ' + this.score);
+				},
+				callbackScope: this,
+				loop: true,
+			});
+		}
+
+		if (!this.startScroll) {
+			return;
+		}
 
 		this.scrollSpeed = 4 + this.score * 0.1;
-
 		this.bg.tilePositionX += this.scrollSpeed;
 
 		if (!this.cursors.left.isDown && !this.cursors.right.isDown) {
 			this.player.x -= this.scrollSpeed;
 		}
 
-		if (this.cursors.left.isDown) {
+		if (this.cursors.down.isDown && this.player.body.blocked.down) {
+			this.player.refreshBody();
+			this.player.setVelocityX(0);
+
+			this.player.setFlipX(false);
+
+			this.player.body.setSize(180, 200);
+			this.player.body.setOffset(135, 220);
+			isMoving = false;
+			this.isDucking = true;
+		} else if (this.cursors.right.isDown) {
+			isMoving = true;
+			this.isDucking = false;
+			this.player.setFlipX(false);
+			this.player.setVelocityX(this.speed);
+			this.player.body.setSize(180, 375);
+			this.player.body.setOffset(130, 50);
+		} else if (this.cursors.left.isDown) {
+			isMoving = true;
+			this.isDucking = false;
 			this.player.setVelocityX(-this.speed * 2);
 			this.player.setFlipX(true);
 			this.player.body.setSize(180, 375);
-			isMoving = true;
-		} else if (this.cursors.right.isDown) {
-			isMoving = true;
-			this.player.setVelocityX(this.speed);
-			this.player.setFlipX(false);
-			this.player.body.setSize(180, 375);
-			this.player.body.setOffset(130, 50);
-		} else if (this.cursors.down.isDown && this.player.body.blocked.down) {
-			this.player.refreshBody();
-			this.player.setVelocityX(0);
-			// this.player.refreshBody();
-			this.player.body.setSize(180, 200);
-			this.player.body.setOffset(135, 220);
-			isDucking = true;
+			this.player.body.setOffset(380, 50);
 		} else {
+			this.isDucking = false;
 			this.player.setVelocityX(0);
 			this.player.body.setSize(180, 375);
 			this.player.body.setOffset(130, 50);
 		}
 
-		if (this.player.flipX) {
+		if (this.player.flipX && !this.isDucking) {
 			this.player.body.setOffset(380, 50);
 		}
 
@@ -193,7 +224,7 @@ class MainScene extends Phaser.Scene {
 			if (this.player.anims.getName() !== 'run') {
 				this.player.play('run');
 			}
-		} else if (isDucking) {
+		} else if (this.isDucking) {
 			if (this.player.anims.getName() !== 'duck') {
 				this.player.play('duck');
 			}
@@ -224,6 +255,26 @@ class MainScene extends Phaser.Scene {
 
 		this.keysPressedText.setText('Keys: ' + pressedKeys.join(', '));
 	}
+
+	// pauseGame() {
+	//   if (this.gameIsOver) return;
+	//   if (this.scene.isPaused()) {
+	//     this.scene.resume();
+	//     this.physics.resume();
+	//     this.scoreText.setVisible(true);
+	//   } else {
+	//     this.scene.pause();
+	//     this.physics.pause();
+	//     this.scoreText.setVisible(false);
+	//   }
+	// }
+
+	// restartGame() {
+	//   this.scene.restart();
+	//   this.physics.resume();
+	//   this.score = 0;
+	//   this.scoreText.setText('Score: 0');
+	//   this.gameIsOver = false;
 
 	gameOver() {
 		this.physics.pause();
