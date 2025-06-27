@@ -151,7 +151,6 @@ class MainScene extends Phaser.Scene {
 		) {
 			this.startScroll = true;
 
-			// Start the score timer now that scrolling begins
 			this.time.addEvent({
 				delay: 1000,
 				callback: () => {
