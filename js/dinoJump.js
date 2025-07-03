@@ -14,6 +14,7 @@ class MainScene extends Phaser.Scene {
 			this.load.image(`jump${i}`, `assets/dino/Jump (${i}).png`);
 		}
 		this.load.image('background', 'assets/background/desert_big.jpg');
+    this.load.image('background_night', 'assets/background/desert_big_night.jpg');
 		this.load.image('obstacle', 'assets/obstacles/cactus.png');
 	}
 
@@ -26,6 +27,7 @@ class MainScene extends Phaser.Scene {
     this.restartButton = null;
     this.gameOverText = null;
     this.isPaused = false;
+    this.hasBackgroundSwitched = false;
 
 		const centerX = this.cameras.main.width / 2;
 		const centerY = this.cameras.main.height / 2;
@@ -34,6 +36,9 @@ class MainScene extends Phaser.Scene {
 			.tileSprite(0, 0, 1920, 2000, 'background')
 			.setOrigin(0)
 			.setDepth(-1);
+
+    this.currentBackground = 'background';
+    this.lastSwitchScore = 0;  
 
 		this.anims.create({
 			key: 'idle',
@@ -169,6 +174,17 @@ class MainScene extends Phaser.Scene {
 	this.scrollSpeed = 4 + this.score * 0.1;
 	this.bg.tilePositionX += this.scrollSpeed;
 
+  if (this.score >= this.lastSwitchScore + 30) {
+	if (this.currentBackground === 'background') {
+		this.bg.setTexture('background_night');
+		this.currentBackground = 'background_night';
+	} else {
+		this.bg.setTexture('background');
+		this.currentBackground = 'background';
+	}
+	this.lastSwitchScore = this.score;
+  }
+
 	if (!this.cursors.left.isDown && !this.cursors.right.isDown) {
 		this.player.x -= this.scrollSpeed;
 	}
@@ -264,7 +280,6 @@ class MainScene extends Phaser.Scene {
 		this.scoreText.setVisible(false);
 	}
 }
-
 
 	restartGame() {
 		this.scene.restart();
