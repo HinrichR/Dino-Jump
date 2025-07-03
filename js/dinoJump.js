@@ -94,7 +94,7 @@ class MainScene extends Phaser.Scene {
 				obstacle.body.allowGravity = false;
 				obstacle.setImmovable(true);
 				obstacle.setSize(65, 160, true);
-				obstacle.setOffset(55, 25);
+				obstacle.setOffset(55, 35);
 				this.obstacles.add(obstacle);
 			}
 			const nextDelay = Phaser.Math.Between(3000, 6000);
@@ -305,7 +305,7 @@ const config = {
 		default: 'arcade',
 		arcade: {
 			gravity: { y: 1300 },
-			debug: true,
+			debug: false,
 		},
 	},
 	scene: MainScene,
