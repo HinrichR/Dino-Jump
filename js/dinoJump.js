@@ -16,6 +16,7 @@ class MainScene extends Phaser.Scene {
 		this.load.image('background', 'assets/background/desert_big.jpg');
     this.load.image('background_night', 'assets/background/desert_big_night.jpg');
 		this.load.image('obstacle', 'assets/obstacles/cactus.png');
+    this.load.image('obstacle_night', 'assets/obstacles/cactus_night.png');
 	}
 
 	create() {
@@ -38,6 +39,7 @@ class MainScene extends Phaser.Scene {
 			.setDepth(-1);
 
     this.currentBackground = 'background';
+    this.currentobstacle = 'obstacle';
     this.lastSwitchScore = 0;  
 
 		this.anims.create({
@@ -129,6 +131,14 @@ class MainScene extends Phaser.Scene {
 			fontFamily: 'Arial',
 			align: 'center',
 		}).setOrigin(0.5);
+
+    // Nacht-Overlay erstellen, ganz transparent
+    this.nightOverlay = this.add.rectangle(0, 0, 1920, 1100, 0x000000)
+    .setOrigin(0)
+    .setScrollFactor(0)
+    .setDepth(9999) // ganz oben
+    .setAlpha(0);   // Start transparent
+
 	}
 
 	startGame() {
@@ -136,18 +146,22 @@ class MainScene extends Phaser.Scene {
 		this.startText.setVisible(false);
 		this.scoreText.setVisible(true);
 		this.keysPressedText.setVisible(true);
+    
+    // Initiale Richtung: Nacht kommt
+    this.isNight = false;
+    this.time.delayedCall(50000, () => {
+    this.switchDayNight();
+    });
 
-		this.time.addEvent({
-			delay: 1000,
-			callback: () => {
-				if (!this.gameIsOver && !this.scene.isPaused()) {
-					this.score++;
-					this.scoreText.setText('Score: ' + this.score);
-				}
-			},
-			callbackScope: this,
-			loop: true,
-		});
+		this.scoreTimer = this.time.addEvent({
+    delay: 1000,
+    callback: () => {
+      this.score++;
+      this.scoreText.setText('Score: ' + this.score);
+    },
+    callbackScope: this,
+    loop: true,
+  });
 	}
 
 	update(time, delta) {
@@ -173,17 +187,6 @@ class MainScene extends Phaser.Scene {
 
 	this.scrollSpeed = 4 + this.score * 0.1;
 	this.bg.tilePositionX += this.scrollSpeed;
-
-  if (this.score >= this.lastSwitchScore + 30) {
-	if (this.currentBackground === 'background') {
-		this.bg.setTexture('background_night');
-		this.currentBackground = 'background_night';
-	} else {
-		this.bg.setTexture('background');
-		this.currentBackground = 'background';
-	}
-	this.lastSwitchScore = this.score;
-  }
 
 	if (!this.cursors.left.isDown && !this.cursors.right.isDown) {
 		this.player.x -= this.scrollSpeed;
@@ -258,27 +261,42 @@ class MainScene extends Phaser.Scene {
 	if (this.jumpKey.isDown) pressedKeys.push('SPACE');
 	if (this.cursors.down.isDown) pressedKeys.push('↓');
 	this.keysPressedText.setText('Keys: ' + pressedKeys.join(', '));
+} 
+
+  switchDayNight() {
+    this.isNight = !this.isNight;
+
+    this.tweens.add({
+      targets: this.nightOverlay,
+      alpha: this.isNight ? 0.5 : 0, // z.B. 0.5 für Nacht, 0 für Tag
+      duration: 5000, // 5 Sekunden Übergang
+      ease: 'Sine.easeInOut',
+      onComplete: () => {
+        // Nächster Wechsel in 30 Sekunden
+        this.time.delayedCall(45000, () => this.switchDayNight(), [], this);
+      }
+    });
 }
 
 	togglePause() {
-	if (this.gameIsOver) return;
+  if (this.gameIsOver) return;
 
-	this.isPaused = !this.isPaused;
+  this.isPaused = !this.isPaused;
 
-	if (!this.isPaused) {
-		this.physics.resume();
-		this.pauseText?.destroy();
-		this.scoreText.setVisible(true);
-	} else {
-		this.physics.pause();
-		this.pauseText = this.add.text(
-			this.cameras.main.centerX,
-			this.cameras.main.centerY,
-			'PAUSE\nDrücke → zum Fortsetzen',
-			{ fontSize: '48px', fill: '#fff', align: 'center', fontFamily: 'Arial' }
-		).setOrigin(0.5);
-		this.scoreText.setVisible(false);
-	}
+  if (!this.isPaused) {
+    this.physics.resume();
+    this.pauseText?.destroy();
+    if (this.scoreTimer) this.scoreTimer.paused = false;
+  } else {
+    this.physics.pause();
+    this.pauseText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      'PAUSE\nDrücke → zum Fortsetzen',
+      { fontSize: '48px', fill: '#fff', align: 'center', fontFamily: 'Arial' }
+    ).setOrigin(0.5);
+    if (this.scoreTimer) this.scoreTimer.paused = true;
+  }
 }
 
 	restartGame() {
