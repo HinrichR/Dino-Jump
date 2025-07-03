@@ -77,7 +77,7 @@ class MainScene extends Phaser.Scene {
 		this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
 
 		this.ground = this.physics.add.staticGroup();
-		this.ground.create(910, 855, null).setDisplaySize(3200, 40).setVisible(false).refreshBody();
+		this.ground.create(910, 855, null).setDisplaySize(5000, 40).setVisible(false).refreshBody();
 
 		this.leftWall = this.physics.add.staticImage(0, this.cameras.main.height / 2, null)
 			.setDisplaySize(10, this.cameras.main.height)
