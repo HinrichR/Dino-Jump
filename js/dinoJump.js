@@ -14,9 +14,7 @@ class MainScene extends Phaser.Scene {
 			this.load.image(`jump${i}`, `assets/dino/Jump (${i}).png`);
 		}
 		this.load.image('background', 'assets/background/desert_big.jpg');
-    this.load.image('background_night', 'assets/background/desert_big_night.jpg');
 		this.load.image('obstacle', 'assets/obstacles/cactus.png');
-    this.load.image('obstacle_night', 'assets/obstacles/cactus_night.png');
 	}
 
 	create() {
@@ -29,6 +27,7 @@ class MainScene extends Phaser.Scene {
     this.gameOverText = null;
     this.isPaused = false;
     this.hasBackgroundSwitched = false;
+    this.score = 0;
 
 		const centerX = this.cameras.main.width / 2;
 		const centerY = this.cameras.main.height / 2;
@@ -91,30 +90,39 @@ class MainScene extends Phaser.Scene {
 		this.obstacles = this.physics.add.group();
 
 		this.spawnObstacle = () => {
-			if (this.gameIsOver) return;
-			const groupSize = Phaser.Math.Between(1, 3);
-			const baseX = 2200;
-			for (let i = 0; i < groupSize; i++) {
-				const spacing = 75 ;
-				const x = baseX + i * spacing;
-				const obstacle = this.physics.add.sprite(x, 730, 'obstacle');
-				obstacle.body.allowGravity = false;
-				obstacle.setImmovable(true);
-				obstacle.setSize(65, 160, true);
-				obstacle.setOffset(55, 35);
-				this.obstacles.add(obstacle);
-			}
-			const nextDelay = Phaser.Math.Between(3000, 6000);
-			this.time.delayedCall(nextDelay, this.spawnObstacle, [], this);
-		};
+	    if (this.gameIsOver) return;
+
+	    const baseX = 2200;
+	    const maxGroupSize = Math.min(2 + Math.floor(this.score / 50), 5); // dynamische Gruppengröße
+	    const groupSize = Phaser.Math.Between(1, maxGroupSize);
+
+	    for (let i = 0; i < groupSize; i++) {
+		    const spacing = 75;
+		    const x = baseX + i * spacing;
+		    const obstacle = this.physics.add.sprite(x, 730, 'obstacle');
+		    obstacle.body.allowGravity = false;
+		    obstacle.setImmovable(true);
+		    obstacle.setSize(65, 160, true);
+		    obstacle.setOffset(55, 35);
+		    this.obstacles.add(obstacle);
+	    }
+
+      // Dynamischer Spawn-Timer basierend auf Score
+	    const minDelay = 1300;
+	    const maxDelay = 4000;
+	    let delay = maxDelay - this.score * 10;
+	    delay = Phaser.Math.Clamp(delay, minDelay, maxDelay);
+	    const nextDelay = Phaser.Math.Between(delay * 0.8, delay * 1.2);
+
+	    this.time.delayedCall(nextDelay, this.spawnObstacle, [], this);
+    };
 
 		this.spawnObstacle();
 		this.physics.add.collider(this.player, this.obstacles, () => this.gameOver());
 		this.physics.add.collider(this.obstacles, this.ground);
 
-		this.score = 0;
 		this.scoreText = this.add.text(20, 20, 'Score: 0', {
-			fontSize: '32px',
+			fontSize: '32px', 
 			fill: '#fff',
 			fontFamily: 'Arial',
 		}).setScrollFactor(0).setVisible(false);
@@ -147,9 +155,8 @@ class MainScene extends Phaser.Scene {
 		this.scoreText.setVisible(true);
 		this.keysPressedText.setVisible(true);
     
-    // Initiale Richtung: Nacht kommt
     this.isNight = false;
-    this.time.delayedCall(50000, () => {
+    this.time.delayedCall(45000, () => {
     this.switchDayNight();
     });
 
